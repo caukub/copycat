@@ -1,0 +1,35 @@
+[application]
+host = "127.0.0.1"
+port = 8080
+
+body_limit_in_bytes = 100_000_000_000
+
+[storage]
+method = "file"
+directory = "./data"
+id_length = 7
+expiration_in_hours = 0
+
+[frontend]
+directory = "./frontend"
+
+[frontend.svelte]
+enable_support = true
+app_dir = "app"
+
+[cors]
+allow_origin = "*"
+
+[paste]
+size_limit_in_bytes = 5_000_000
+
+[analyzer]
+custom_highlighting_delimiters = ["Multicraft]", "PebbleHost]", "PebbleHost Loader]"]
+
+[analyzer.lines_limits]
+server = 2_000
+plugins = 2_000
+ports = 2_000
+
+[redis]
+uri = "redis://127.0.0.1:6379/"

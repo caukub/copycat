@@ -1,0 +1,12 @@
+[ports.plugins]
+votifier = ["Votifier enabled on socket"]
+geyser = ["Geyser started on"]
+dynmap = ["Web server started on address"]
+simplevoicechat = ["[voicechat] Server started at port"]
+plan = ["Webserver running on PORT"]
+
+[ports.mods]
+simplevoicechat = [
+    "[voicechat/] Server started at port",
+    "[voicechat] Server started at port"
+]
