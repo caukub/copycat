@@ -1,7 +1,7 @@
 # CopyCat
 CopyCat is an pastebin service mainly for Minecraft servers written in Rust built on top of [mclog](https://github.com/quick-898/mclog).
 
-Thanks to advanced [static and dynamic analyzer](https://github.com/quick-898/copycat/wiki/Analyzer) powered by [Rhai](https://rhai.rs/) embedded scripting language you can easily get information about the server and give solution how to solve issues based on it.
+Thanks to advanced [static and dynamic analyzer](https://github.com/quick-898/copycat/wiki/Analyzer) powered by [Rhai](https://rhai.rs/) embedded scripting language, you can easily get information about server and give users solution how to solve issues based on it.
 
 ## Motivation
 After reading hundreds of Minecraft logs, I've seen *a lot* of repetetion that I wanted to automate. Unfortunately, all alternatives I could find didn't fit our needs, mainly because of the lack of flexibility in detecting errors and solutions for them.
@@ -22,10 +22,12 @@ Static analyzer gives you basic information about the log, this includes:
 You can write custom detection scripts based on information provided by static analyzer. If you're curious how it works, check [/scripts/](/scripts/).
 To completely understand dynamic analyzer, check [wiki](https://github.com/quick-898/copycat/wiki/Analyzer#Dynamic).
 
+### API
+
 ### IP address hider
 IP addresses are hidden but plugin versions that matches IP addresses not :tada:
 
-## Fast
+### Fast
 CopyCat is fast. Well.. fast enough. It can definitely be faster but thanks to Rust and nature of Minecraft logs, there was never a need to think about optimizing the speed.
 
 ## Installation
