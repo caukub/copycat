@@ -12,7 +12,7 @@ That's why CopyCat has [dynamic analyzer](https://github.com/quick-898/copycat/w
 ### Static analyzer
 Static analyzer gives you basic information about the log, this includes:
 - [x] Highlighting - different highlighting for info/warn/error messages, also higlighting for specific messages without log level (usually hosting messages) is supported
-  
+
   This works without 0 lines of JavaScript and supports different platform/hosting formats, so both logs with `INFO]:` and `INFO:` formats will be highlighted properly.
 - [x] Server info (version, platform and its version)
 - [x] Plugin info (if present, its version)
@@ -23,6 +23,7 @@ You can write custom detection scripts based on information provided by static a
 To completely understand dynamic analyzer, check [wiki](https://github.com/quick-898/copycat/wiki/Analyzer#Dynamic).
 
 ### API
+Thanks to developer API you can easily integrate CopyCat with different platforms like Discord or hosting panel
 
 ### IP address hider
 IP addresses are hidden but plugin versions that matches IP addresses not :tada:
