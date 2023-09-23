@@ -28,7 +28,7 @@ To completely understand dynamic analyzer, check [wiki](https://github.com/quick
 IP addresses are hidden but plugin versions that matches IP addresses not :tada:
 
 ### Fast
-CopyCat is fast. Well.. fast enough. It can definitely be faster in some areas but thanks to Rust, there was never a need to think about optimizing the speed.
+CopyCat is fast. Well.. fast enough. It can be faster in some areas but thanks to Rust, there was never a need to think about optimizing the speed.
 
 ## Installation
 To learn how to run CopyCat check [wiki installation page](https://github.com/quick-898/copycat/wiki/Instalation).
