@@ -31,5 +31,8 @@ server = 2_000
 plugins = 2_000
 ports = 2_000
 
+[api]
+public = false
+
 [redis]
 uri = "redis://127.0.0.1:6379/"
