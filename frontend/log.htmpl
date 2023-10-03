@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.png">
+    <title>Paste | CopyCat</title>
+</head>
+
+<body>
+    {% if detections %}
+    <div>
+        {% for detection in detections -%}
+        <div>
+            <div>
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    {{ detection.header -}}
+                </div>
+                <div>
+                    {% if detection.detail %}
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    <a href="/details/{{ detection.detail -}}">Detail</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div>
+            {% if detection.solutions %}
+            <div>Solutions</div>
+            {% endif %}
+            <div>
+                {% for solution in detection.solutions -%}
+                <div>{{solution -}}</div>
+                {% endfor %}
+            </div>
+        </div>
+        {%- endfor %}
+    </div>
+    {% endif %}
+    <a href="/raw/{{id}}">Raw</a>
+    <pre>##content##</pre>
+</body>
+
+</html>

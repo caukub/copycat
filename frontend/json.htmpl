@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/agate.min.css"
+        integrity="sha512-wI7oXtzNHj/bqfLA3P6x3XYbcwzsnIKaPLfjjX8ZAXhc65+kSI6sh8gLOOByOKImokAjHUQR0xAJQ/xZTzwuOA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"
+        integrity="sha512-ZFn1l/cmJ8LLHH5TWJhNnV1PCQiNqBD+TFitO1ECtYJuQvn8zhhrzvQyYXLrb5cR7gzmLTkgka8DDR7fIAO9MQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>hljs.highlightAll();</script>
+
+    <title>Paste | CopyCat</title>
+</head>
+
+<body>
+    <a href="/raw/{{id}}">Raw</a>
+    <!-- language-json class for highlight.js -->
+    <pre><code class="language-json">##content##</code></pre>
+</body>
+
+</html>
