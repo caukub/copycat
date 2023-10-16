@@ -34,5 +34,8 @@ CopyCat is fast. Well.. fast enough. It can be faster in some areas but thanks t
 ## Installation
 To learn how to run CopyCat check: [wiki installation page](https://github.com/quick-898/copycat/wiki/Instalation).
 
+## TODO
+- [] Entry type in script with callback support
+
 ## Special thanks
 - [kyngs](https://github.com/kyngs) for the name idea.
