@@ -8,6 +8,7 @@
     <title>Paste | Detail of {{id}} | CopyCat</title>
 </head>
 <body>
+<!-- ##content## is replaced with markdown in /details/ID.md -->
 ##content##
 </body>
 </html>
