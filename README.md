@@ -35,7 +35,7 @@ CopyCat is fast. Well.. fast enough. It can be faster in some areas but thanks t
 To learn how to run CopyCat check: [wiki installation page](https://github.com/quick-898/copycat/wiki/Instalation).
 
 ## TODO
-- [ ] Log entry type in script with closure (callback) support
+- Log entry type in script with closure (callback) support
 
 ## Special thanks
 - [kyngs](https://github.com/kyngs) for the name idea.
