@@ -31,6 +31,9 @@ IP addresses are hidden but the plugin versions that match the IP addresses are 
 ### Fast
 CopyCat is fast. Well.. fast enough. It can be faster in some areas but thanks to Rust, there was never a need to think about optimizing the speed.
 
+## JSON and YAML support
+CopyCat also support Y(A)ML and JSON files so configuration files can be displayed properly.
+
 ## Installation
 To learn how to run CopyCat check: [wiki installation page](https://github.com/quick-898/copycat/wiki/Instalation).
 
