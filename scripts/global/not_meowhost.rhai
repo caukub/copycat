@@ -10,4 +10,4 @@ if server_port > 0 && !server_port.to_string().ends_with("0") {
 [NotMeowHost]
 header = "This server is not hosted on MeowHost"
 solutions = []
-private = false # 🤫this detection is not shown to users but can be accessed through API
+private = true # 🤫this detection is not shown to users but can be accessed through API
