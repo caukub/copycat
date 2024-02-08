@@ -26,7 +26,7 @@ To completely understand the dynamic analyzer, check [wiki](https://github.com/q
 Thanks to the developer API, you can easily integrate CopyCat with different platforms like Discord or a hosting panel.
 
 ### IP address hider
-IP addresses are hidden but the plugin versions that match the IP addresses are not :tada: .
+IP addresses are hidden but plugin or server related versions that matches IP addresses are not :tada: .
 
 ### Fast
 CopyCat is fast. Well.. fast enough. It can be faster in some areas but thanks to Rust, there was never a need to think about optimizing the speed.
