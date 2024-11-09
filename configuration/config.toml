@@ -10,13 +10,6 @@ directory = "./data"
 id_length = 7
 expiration_in_hours = 0
 
-[frontend]
-directory = "./frontend"
-
-[frontend.svelte]
-enable_support = true
-app_dir = "app"
-
 [cors]
 allow_origin = "*"
 
@@ -24,7 +17,7 @@ allow_origin = "*"
 size_limit_in_bytes = 5_000_000
 
 [analyzer]
-custom_highlighting_delimiters = ["Multicraft]", "PebbleHost]", "PebbleHost Loader]"]
+custom_highlighting_delimiters = ["Multicraft]", "PebbleHost]", "PebbleHost Loader]", "[Hosting]:", "Hosting:"]
 
 [analyzer.lines_limits]
 server = 2_000
@@ -32,7 +25,9 @@ plugins = 2_000
 ports = 2_000
 
 [api]
-public = false
+public = true
+no_auth = true
 
 [redis]
-uri = "redis://127.0.0.1:6379/"
+url = "redis://127.0.0.1:6379/"
+pool_size = 8
