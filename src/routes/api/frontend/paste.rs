@@ -84,7 +84,7 @@ pub async fn get_paste(
                 .map_err(|_| ApiError::Client("Couldn't read file to String"))?;
 
         let response = NoLogResponse {
-            content,
+            content: html_escape::encode_text(&content).to_string(),
             paste_type,
         };
 
