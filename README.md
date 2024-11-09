@@ -1,12 +1,12 @@
-# CopyCat
-CopyCat is a pastebin service mainly for Minecraft servers written in Rust and built on top of [mclog](https://github.com/quick-898/mclog).
+# copycat
+copycat is a pastebin service mainly for Minecraft servers written in Rust and built on top of [mclog](https://github.com/caukub/mclog).
 
-Thanks to the advanced [static and dynamic analyzers](https://github.com/quick-898/copycat/wiki/Analyzer) powered by [Rhai](https://rhai.rs/) embedded scripting language, you can easily get information about a server and give the users solutions on how to solve issues based on it.
+Thanks to the advanced [static and dynamic analyzers](https://github.com/caukub/copycat/wiki/Analyzer) powered by [Rhai](https://rhai.rs/) embedded scripting language, you can easily get information about a server and give the users solutions on how to solve issues based on it.
 
 ## Motivation
 After reading hundreds of Minecraft logs, I've seen *a lot* of repetition that I wanted to automate. Unfortunately, all alternatives that I found didn't fit our needs, mainly because of the lack of flexibility in detecting errors and solutions for them.
 
-That's why CopyCat has a [dynamic analyzer](https://github.com/quick-898/copycat/wiki/Analyzer#Dynamic) which allows you to write custom detection scripts based on many factors like the server info, plugin info, or the log content itself.
+That's why copycat has a [dynamic analyzer](https://github.com/caukub/copycat/wiki/Analyzer#Dynamic) which allows you to write custom detection scripts based on many factors like the server info, plugin info, or the log content itself.
 
 ## Features
 ### Static analyzer
@@ -20,22 +20,22 @@ This works with 0 lines of JavaScript and supports different platform/hosting fo
 
 ### Dynamic analyzer
 You can write custom detection scripts based on information that is provided by a static analyzer. If you're curious about how it works, check [/scripts/](/scripts/).
-To completely understand the dynamic analyzer, check [wiki](https://github.com/quick-898/copycat/wiki/Analyzer#Dynamic).
+To completely understand the dynamic analyzer, check [wiki](https://github.com/caukub/copycat/wiki/Analyzer#Dynamic).
 
 ### API
-Thanks to the developer API, you can easily integrate CopyCat with different platforms like Discord or a hosting panel.
+Thanks to the developer API, you can easily integrate copycat with different platforms like Discord or a hosting panel.
 
 ### IP address hider
 IP addresses are hidden but plugin or server related versions that matches IP addresses are not :tada: .
 
 ### Fast
-CopyCat is fast. Well.. fast enough. It can be faster in some areas but thanks to Rust, there was never a need to think about optimizing the speed.
+copycat is fast. Well... fast enough. It can be faster in some areas but thanks to Rust, there was never a need to think about optimizing the speed.
 
 ## JSON and YAML support
-CopyCat also support Y(A)ML and JSON files so configuration files can be displayed properly.
+copycat also support Y(A)ML and JSON files so configuration files can be displayed properly.
 
 ## Installation
-To learn how to run CopyCat check: [wiki installation page](https://github.com/quick-898/copycat/wiki/Instalation).
+To learn how to run copycat check: [wiki installation page](https://github.com/caukub/copycat/wiki/Instalation).
 
 ## TODO
 - Log entry type in script with closure (callback) support
