@@ -43,7 +43,7 @@ pub async fn get_paste(
     let limits = app_state.configuration.analyzer.lines_limits.clone();
 
     if let PasteType::Log = paste_type {
-        let lines = get_paste_lines(id.clone(), &app_state.configuration, limits.max()).await?;
+        let lines = get_paste_lines(id.clone(), &app_state.configuration, 50_000).await?;
         let parser = Parser::new(
             lines,
             app_state
