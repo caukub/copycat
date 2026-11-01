@@ -1,7 +1,8 @@
 [package]
 name = "copycat"
 version = "0.1.0"
-edition = "2021"
+authors = ["caukub"]
+edition = "2024"
 
 [lib]
 path = "src/lib.rs"
@@ -10,25 +11,26 @@ path = "src/lib.rs"
 path = "src/main.rs"
 name = "copycat"
 
+[features]
+default = ["magika"]
+magika = ["dep:magika"]
+
+
 [dependencies]
-anyhow = "1.0.93"
-axum = { version = "0.7.7", features = ["tracing", "multipart"] }
-config = "0.14.1"
-fred = "9.4.0"
+askama = "0.15.1"
+axum = { version = "0.8.8", features = ["multipart"] }
+config = "0.15.19"
+rand = "0.9.2"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_yaml = { package = "yaml_serde", version = "0.10.7" }
+tokio = { version = "1.49.0", features = ["signal", "net", "rt-multi-thread", "io-util", "fs"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
+# mclog = { version = "0.1.0", path = "../mclog" }
 mclog = { git = "https://github.com/caukub/mclog.git" }
-html-escape = "0.2.13"
-rand = "0.8.5"
-regex = "1.11.1"
-rhai = { version = "1.18.0", features = ["only_i32"] }
-semver = "1.0.23"
-serde = { version = "1.0.214", features = ["derive"] }
-serde_json = "1.0.132"
-serde_yaml = "0.9.34"
-tokio = { version = "1.41.1", features = ["rt-multi-thread", "fs", "net"] }
-tokio-stream = "0.1.16"
-tokio-util = { version = "0.7.12", features = ["io"] }
-toml = "0.8.19"
-tower-http = { version = "0.6.1", features = ["cors", "trace", "fs", "compression-full", "limit"] }
-tracing = "0.1.40"
-tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
-futures = "0.3.31"
+magika = { version = "1.1.0", optional = true }
+ort = "=2.0.0-rc.12"
+futures-util = "0.3.31"
+tokio-util = { version = "0.7.18", features = ["io"] }
+serde_json = "1.0.149"
+tower-http = { version = "0.6.8", features = ["fs", "cors"] }

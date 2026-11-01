@@ -1,33 +1,24 @@
 [application]
-host = "0.0.0.0"
-port = 8080
-
-body_limit_in_bytes = 100_000_000_000
+host = "::1"
+port = 3000
+body_limit_in_bytes = 100_000_000
 
 [storage]
-method = "file"
-directory = "./data"
-id_length = 7
-expiration_in_hours = 0
+directory = "data"
+max_size_in_bytes = 2_500_000
+
+[paste]
+id_length = 8
+expiration_in_hours = 8_640
+
+[parser]
+level_suffix_lines_limit = 200
+custom_highlighting_delimiters = ["Multicraft]", "PebbleHost]", "PebbleHost Loader]", "[Hosting]:", "Hosting:"]
+
+[analyzer]
+limits = "versions (server, plugins, mods) AND port (server, plugins, mods)"
 
 [cors]
 allow_origin = "*"
 
-[paste]
-size_limit_in_bytes = 5_000_000
-
-[analyzer]
-custom_highlighting_delimiters = ["Multicraft]", "PebbleHost]", "PebbleHost Loader]", "[Hosting]:", "Hosting:"]
-
-[analyzer.lines_limits]
-server = 2_000
-plugins = 2_000
-ports = 2_000
-
 [api]
-public = true
-no_auth = true
-
-[redis]
-url = "redis://redis:6379/"
-pool_size = 8

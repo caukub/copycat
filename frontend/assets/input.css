@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+@theme {
+  --color-hostify-blue: oklch(62.94% 0.2024 255.43);
+  --color-hostify-yellow: oklch(85.61% 0.1697 87.22);
+  --color-hostify-red: oklch(59.45% 0.1994 20.78);
+}

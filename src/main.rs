@@ -1,113 +1,144 @@
-use axum::extract::DefaultBodyLimit;
-use axum::http::{HeaderValue, Method};
-use axum::routing::{get, post};
-use axum::{middleware, Router};
-use copycat::configuration::{get_configuration, Settings};
-use copycat::middleware::{api_admin_middleware, api_middleware};
-use copycat::paste::analyzer::PasteAnalyzer;
-use copycat::redis::get_redis_connection;
-use copycat::routes::api::{
-    all::get_api_all, frontend::detail::get_frontend_api_detail, frontend::paste::get_paste,
-    leaks::get_api_leaks, plugins::get_api_plugins, ports::get_api_ports,
+use axum::{
+    Router,
+    extract::DefaultBodyLimit,
+    http::{HeaderValue, Method},
+    routing::{get, post},
 };
-use copycat::routes::{
-    get::raw::get_raw,
-    post::{get_expiration, upload::post_upload},
+use copycat::{
+    AppState,
+    configuration::get_configuration,
+    expiration::delete_expired,
+    routes::{index_handler, paste_handler, raw_handler, upload_handler},
+    tracing::init_tracing,
 };
-use copycat::{AppState, RedisState};
-use fred::{clients::RedisPool, interfaces::KeysInterface};
-use mclog::analyzer::dynamic::{ScriptPlatform, SCRIPTS_DIRECTORY};
-use std::net::SocketAddr;
-use tower_http::{cors::CorsLayer, limit::RequestBodyLimitLayer};
-use tracing::debug;
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use std::net::{IpAddr, SocketAddr};
+use tokio::signal;
+use tower_http::{cors::CorsLayer, services::ServeDir};
+use tracing::{debug, error};
 
 #[tokio::main]
 async fn main() {
-    let configuration = get_configuration().expect("Failed to read configuration");
-    let redis_pool = get_redis_connection(&configuration)
-        .await
-        .expect("Failed to connect to Redis server");
+    init_tracing();
 
-    Initializer::new(redis_pool.clone(), configuration.clone())
-        .init()
-        .await;
+    let configuration = get_configuration().unwrap_or_else(|err| {
+        error!("Failed to read configuration: {}", err);
+        std::process::exit(1);
+    });
 
-    let app = Application::new(&configuration);
+    let data_config = configuration.storage.clone();
 
-    let cors_layer = CorsLayer::new()
-        .allow_origin(
-            configuration
-                .cors
-                .allow_origin
-                .parse::<HeaderValue>()
-                .expect("Couldn't parse allow_origin from config into HeaderValue"),
-        )
-        .allow_methods([Method::GET, Method::POST]);
-
-    let redis_state = RedisState { pool: redis_pool };
+    std::fs::create_dir_all(data_config.directory.join("metadata")).unwrap_or_else(|err| {
+        error!("Failed to create data directory: {}", err);
+        std::process::exit(1);
+    });
 
     let app_state = AppState {
         configuration: configuration.clone(),
-        redis_state,
     };
 
-    let frontend_api_router = Router::new()
-        .route("/paste/:id", get(get_paste))
-        .route("/detail/:detail_id", get(get_frontend_api_detail))
-        .layer(middleware::from_fn_with_state(
-            app_state.clone(),
-            api_admin_middleware,
-        ));
+    let origin = configuration
+        .cors
+        .allow_origin
+        .parse::<HeaderValue>()
+        .unwrap_or_else(|err| {
+            error!(
+                "Failed to convert origin '{}' into HeaderValue: {}",
+                configuration.cors.allow_origin, err
+            );
+            std::process::exit(1);
+        });
 
-    let api_router = Router::new()
-        .route("/all/:id", get(get_api_all))
-        .route("/plugins/:id", get(get_api_plugins))
-        .route("/ports/:id", get(get_api_ports))
-        .route("/leaks/:id", get(get_api_leaks))
-        //.nest("/admin", admin_api_router)
-        .nest("/frontend", frontend_api_router)
-        .layer(middleware::from_fn_with_state(
-            app_state.clone(),
-            api_middleware,
-        ));
+    let cors = CorsLayer::new()
+        .allow_origin(origin)
+        .allow_methods([Method::GET, Method::POST]);
 
     let router = Router::new()
-        .route("/raw/:id", get(get_raw))
-        .route("/upload", post(post_upload))
-        .nest("/api", api_router);
+        .route("/", get(index_handler))
+        .route("/{id}", get(paste_handler))
+        .route("/upload", post(upload_handler))
+        .route("/raw/{id}", get(raw_handler))
+        .nest_service("/assets", ServeDir::new("./frontend/assets"))
+        .with_state(app_state)
+        .layer(cors)
+        .layer(DefaultBodyLimit::max(configuration.application.body_limit));
 
-    let router = router
-        .layer(cors_layer)
-        .layer(DefaultBodyLimit::max(configuration.application.body_limit))
-        .layer(RequestBodyLimitLayer::new(
-            configuration.application.body_limit,
-        ))
-        .with_state(app_state);
+    let application = Application {
+        host: configuration.application.host,
+        port: configuration.application.port,
+    };
 
-    let address = app.address();
+    let listener = tokio::net::TcpListener::bind(application.address())
+        .await
+        .unwrap_or_else(|err| {
+            error!(
+                "Failed to bind TcpListener on {}: {}",
+                application.address(),
+                err
+            );
+            std::process::exit(1)
+        });
 
-    debug!("listening on {}", address);
+    debug!(
+        "Listening on {}",
+        listener.local_addr().unwrap_or_else(|err| {
+            error!(
+                "Failed to get local_addr of TcpListener '{:?}': {}",
+                listener, err
+            );
+            std::process::exit(1);
+        })
+    );
 
-    let listener = tokio::net::TcpListener::bind(&address).await.unwrap();
+    tokio::spawn(async move {
+        if let Err(err) = delete_expired(&data_config).await {
+            error!(
+                "Failed to run background task for deleting expired files: {}",
+                err
+            );
+            std::process::exit(1);
+        }
+    });
 
     axum::serve(listener, router)
         .with_graceful_shutdown(shutdown_signal())
         .await
-        .unwrap();
+        .unwrap_or_else(|err| {
+            error!("Failed to serve the Axum app: {}", err);
+            std::process::exit(1);
+        })
+}
+
+struct Application {
+    host: String,
+    port: u16,
+}
+
+impl Application {
+    fn address(&self) -> SocketAddr {
+        let host = self.host.parse::<IpAddr>().unwrap_or_else(|err| {
+            error!("Failed to parse '{}' into IpAddr: {}", self.host, err);
+            std::process::exit(1);
+        });
+
+        SocketAddr::from((host, self.port))
+    }
 }
 
 async fn shutdown_signal() {
     let ctrl_c = async {
-        tokio::signal::ctrl_c()
-            .await
-            .expect("Failed to install Ctrl+C handler");
+        signal::ctrl_c().await.unwrap_or_else(|err| {
+            error!("Failed to install Ctrl+C handler: {}", err);
+            std::process::exit(1);
+        });
     };
 
     #[cfg(unix)]
     let terminate = async {
-        tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
-            .expect("Failed to install signal handler")
+        signal::unix::signal(signal::unix::SignalKind::terminate())
+            .unwrap_or_else(|err| {
+                error!("Failed to install signal handler: {}", err);
+                std::process::exit(1);
+            })
             .recv()
             .await;
     };
@@ -118,127 +149,5 @@ async fn shutdown_signal() {
     tokio::select! {
         _ = ctrl_c => {},
         _ = terminate => {},
-    }
-}
-
-struct Application {
-    host: String,
-    port: u16,
-}
-
-impl Application {
-    fn new(configuration: &Settings) -> Self {
-        Self {
-            host: configuration.application.host.clone(),
-            port: configuration.application.port,
-        }
-    }
-
-    fn address(&self) -> SocketAddr {
-        let addr = format!("{}:{}", self.host, self.port);
-
-        let addr: SocketAddr = addr
-            .parse()
-            .unwrap_or_else(|_| panic!("Couldn't convert '{}' to SocketAddr", addr));
-
-        addr
-    }
-}
-
-struct Initializer {
-    pool: RedisPool,
-    configuration: Settings,
-}
-
-impl Initializer {
-    fn new(redis_pool: RedisPool, configuration: Settings) -> Self {
-        Self {
-            pool: redis_pool,
-            configuration,
-        }
-    }
-
-    async fn init(&mut self) {
-        self.init_tracing();
-        self.init_directories();
-        self.generate_content_types().await;
-    }
-
-    fn init_tracing(&self) {
-        tracing_subscriber::registry()
-            .with(
-                tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
-                    "copycat=debug,tower_http=debug,axum::rejection=trace".into()
-                }),
-            )
-            .with(tracing_subscriber::fmt::layer())
-            .init();
-    }
-
-    fn init_directories(&self) {
-        self.init_data_dir();
-        self.init_scripts_dir();
-    }
-
-    fn init_data_dir(&self) {
-        let data_directory = &self.configuration.storage.directory;
-        if !data_directory.exists() {
-            std::fs::create_dir_all(data_directory).expect("Data directory couldn't be created");
-        }
-    }
-
-    fn init_scripts_dir(&self) {
-        if !SCRIPTS_DIRECTORY.exists() {
-            std::fs::create_dir_all(SCRIPTS_DIRECTORY.as_path())
-                .expect("Scripts directory couldn't be created")
-        }
-
-        for platform in ScriptPlatform::iter() {
-            let dir = SCRIPTS_DIRECTORY.join(platform.directory());
-
-            if !dir.exists() {
-                std::fs::create_dir_all(dir)
-                    .expect("Script platform directory couldn't be created");
-            }
-        }
-    }
-
-    async fn generate_content_types(&mut self) {
-        for file in self
-            .configuration
-            .storage
-            .directory
-            .read_dir()
-            .expect("Couldn't read storage directory")
-        {
-            let file = file.unwrap();
-            let file_name = file
-                .file_name()
-                .to_str()
-                .expect("Failed reading file name to str")
-                .to_string();
-
-            let paste_type: Option<String> = self.pool.get(file_name.clone()).await.unwrap_or(None);
-
-            if paste_type.is_none() {
-                let content = tokio::fs::read_to_string(file.path()).await.unwrap();
-                let content_as_bytes = content.as_bytes();
-
-                let paste_analyzer = PasteAnalyzer::new();
-                let paste_type = paste_analyzer.paste_type(content_as_bytes);
-
-                let _: () = self
-                    .pool
-                    .set(
-                        file_name.clone(),
-                        paste_type,
-                        get_expiration(&self.configuration),
-                        None,
-                        false,
-                    )
-                    .await
-                    .unwrap();
-            }
-        }
     }
 }
