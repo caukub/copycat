@@ -22,7 +22,7 @@ Paste | {{ id }}
                         clip-rule="evenodd"
                     />
                 </svg>
-                <h2 class="font-bold">Analýza</h2>
+                <h2 class="font-bold">Analysis</h2>
             </div>
             <div class="flex items-center text-sm font-semibold">
                 <a
@@ -69,7 +69,7 @@ Paste | {{ id }}
 
         {% if !data.platform.is_proxy() %}
         <p class="text-sm font-semibold leading-8">
-            Minecraft verze: <span
+            Minecraft version: <span
                 class="ml-0.5 rounded-sm bg-white px-1.5 py-1 font-bold text-hostify-blue"
                 >
                 {% if let Some(minecraft_version) = data.minecraft_version %}
@@ -83,7 +83,7 @@ Paste | {{ id }}
         {% endif %}
 
         <p class="text-sm font-semibold leading-8">
-            Platforma: <span class="ml-0.5 rounded-sm bg-white px-1.5 py-1 font-bold text-hostify-blue"
+            Platform: <span class="ml-0.5 rounded-sm bg-white px-1.5 py-1 font-bold text-hostify-blue"
                 >{{ data.platform }}
                 {% if let Some(platform_version) = data.platform_version %}
                 ({{ platform_version }})
@@ -138,7 +138,7 @@ Paste | {{ id }}
                     </div>
                     <div class="my-2 flex">
                         {% if let Some(sltn) = detection.solutions %}
-                            <div class="mr-2 flex items-center font-semibold">Řešení</div>
+                            <div class="mr-2 flex items-center font-semibold">Solution</div>
                             <div>
                                 {% match sltn.format %}
                                     {% when SolutionFormat::Or %}

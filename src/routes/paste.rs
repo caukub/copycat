@@ -56,9 +56,9 @@ pub enum SolutionFormat {
 pub async fn paste_handler(Path(id): Path<String>, State(state): State<AppState>) -> Response {
     let format = SolutionFormat::OrderedList;
     let lines = vec![
-        "Vypněte server".to_string(),
-        "Otevřete Správce Souborů/FTP".to_string(),
-        "Smažte složku world".to_string(),
+        "Turn off the server".to_string(),
+        "Open the File Manager/FTP".to_string(),
+        "Delete the world folder (backup before if needed)".to_string(),
     ];
 
     let solutions = Solutions {
@@ -68,7 +68,7 @@ pub async fn paste_handler(Path(id): Path<String>, State(state): State<AppState>
 
     let solutionss = Solutions {
         format: SolutionFormat::default(),
-        lines: vec!["V `server.properties` nastavte `level-name`".to_string()],
+        lines: vec!["In the `server.properties` file, set the value of `level-name`.".to_string()],
     };
 
     let solutionsss = solutionss.clone();
@@ -109,21 +109,15 @@ pub async fn paste_handler(Path(id): Path<String>, State(state): State<AppState>
             platform_version: server_info.platform_version,
             detections: vec![
                 Detection {
-                    header: "Zjištěn zastaralý plugin".to_string(),
+                    header: "Loading a world from a newer version in an older version".to_string(),
                     detail: None,
                     solutions: Some(solutions),
                     line: 1,
                 },
                 Detection {
-                    header: "Svět nemá jméno".to_string(),
+                    header: "World does not have a name".to_string(),
                     detail: None,
                     solutions: Some(solutionss),
-                    line: 3,
-                },
-                Detection {
-                    header: "Svět má jméno".to_string(),
-                    detail: Some("https://x.com/caukub".to_string()),
-                    solutions: Some(solutionsss),
                     line: 3,
                 },
             ],
