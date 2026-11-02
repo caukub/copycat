@@ -6,11 +6,11 @@ Thanks to the advanced [mclog's](https://github.com/caukub/mclog) static analyze
 <table>
   <tr>
     <td align="center" width="50%">
-      <img src="assets/1.png" width="100%" alt="Log showcase">
+      <img src="assets/log_showcase.png" width="100%" alt="Log showcase">
       <br>
     </td>
     <td align="center" width="50%">
-      <img src="assets/2.png" width="100%" alt="Log details showcase">
+      <img src="assets/details_showcase.png" width="100%" alt="Log details showcase">
       <br>
     </td>
   </tr>
