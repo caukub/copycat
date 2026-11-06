@@ -16,11 +16,11 @@ use tokio::{
     sync::Mutex,
 };
 use tokio_util::io::StreamReader;
-use tracing::trace;
+use tracing::{error, trace};
 
 use crate::AppState;
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Debug)]
 #[serde(rename_all = "snake_case")]
 enum PasteType {
     Log,
@@ -48,8 +48,6 @@ pub async fn upload_handler(
 ) -> Result<Redirect, (StatusCode, String)> {
     let id = generate_id(state.configuration.paste.id_length);
 
-    // save max 5 MB, check if json/yaml only if < 1.5 MB
-
     let storage_configuration = state.configuration.storage;
 
     while let Ok(Some(field)) = multipart.next_field().await {
@@ -75,6 +73,8 @@ pub async fn upload_handler(
 
     let paste_type = get_paste_type(&bytes, &content).await;
 
+    error!("{:?}", paste_type);
+
     let metadata = PasteMetadata { paste_type };
 
     let json_metadata = serde_json::to_string(&metadata).unwrap();
@@ -91,18 +91,20 @@ pub async fn upload_handler(
 
 async fn get_paste_type(bytes: &Vec<u8>, content: &str) -> PasteType {
     /// Content with size above this value (in bytes) will be checked only for the `Log` type
-    const CHECK_ONLY_LOG_TYPE_SIZE: usize = 1_850_000;
+    const CHECK_ONLY_LOG_TYPE_SIZE: usize = 1_500_000;
 
     if is_log(content) {
         return PasteType::Log;
     }
+
+    let mut is_valid_yaml = false;
 
     if bytes.len() < CHECK_ONLY_LOG_TYPE_SIZE {
         // JSON needs to be checked first since every valid JSON is valid YAML
         if serde_json::from_str::<serde_json::Value>(&content).is_ok() {
             return PasteType::Json;
         } else if serde_yaml::from_str::<serde_yaml::Value>(&content).is_ok() {
-            return PasteType::Yaml;
+            is_valid_yaml = true;
         }
 
         let file_type = match MAGIKA
@@ -116,7 +118,14 @@ async fn get_paste_type(bytes: &Vec<u8>, content: &str) -> PasteType {
         };
 
         match file_type.content_type() {
-            Some(ContentType::Yaml) => return PasteType::InvalidYaml,
+            Some(ContentType::Yaml) => {
+                // often, raw text is valid YAML too
+                if is_valid_yaml {
+                    return PasteType::Yaml;
+                } else {
+                    return PasteType::InvalidYaml;
+                }
+            }
             Some(ContentType::Json) => return PasteType::InvalidJson,
             _ => {}
         }
