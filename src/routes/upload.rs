@@ -6,12 +6,14 @@ use axum::{
     response::Redirect,
 };
 use futures_util::{Stream, TryStreamExt};
+use magika::ContentType;
 use rand::{Rng, distr::Alphanumeric};
 use serde::Serialize;
-use std::{io, path::PathBuf, pin::pin};
+use std::{io, path::PathBuf, pin::pin, str::Lines, sync::LazyLock};
 use tokio::{
     fs::File,
     io::{AsyncReadExt, AsyncWriteExt, BufWriter},
+    sync::Mutex,
 };
 use tokio_util::io::StreamReader;
 use tracing::trace;
@@ -19,11 +21,13 @@ use tracing::trace;
 use crate::AppState;
 
 #[derive(Serialize, Clone)]
-#[serde(rename_all = "lowercase")]
+#[serde(rename_all = "snake_case")]
 enum PasteType {
     Log,
     Yaml,
     Json,
+    InvalidYaml,
+    InvalidJson,
     Other,
 }
 
@@ -33,6 +37,9 @@ struct PasteMetadata {
     #[serde(rename = "type")]
     paste_type: PasteType,
 }
+
+pub static MAGIKA: LazyLock<Mutex<magika::Session>> =
+    LazyLock::new(|| Mutex::new(magika::Session::new().unwrap()));
 
 #[tracing::instrument(skip(multipart, state))]
 pub async fn upload_handler(
@@ -60,11 +67,13 @@ pub async fn upload_handler(
         }
     }
 
-    let paste_content = tokio::fs::read_to_string(storage_configuration.directory.join(&id))
+    let bytes = tokio::fs::read(storage_configuration.directory.join(&id))
         .await
         .unwrap();
 
-    let paste_type = get_paste_type(&paste_content).await;
+    let content = String::from_utf8_lossy(&bytes);
+
+    let paste_type = get_paste_type(&bytes, &content).await;
 
     let metadata = PasteMetadata { paste_type };
 
@@ -74,25 +83,68 @@ pub async fn upload_handler(
         tokio::fs::File::create(storage_configuration.directory.join("metadata").join(&id))
             .await
             .unwrap();
+
     file.write_all(json_metadata.as_bytes()).await.unwrap();
 
     Ok(Redirect::to(&id))
 }
 
-// check velikosti
-// prvni musi byt json pak yaml
-// mozna se na tohle uplne vykaslat kdyz se pouziva magika
-// tokio spawn? asi ne omezime na 1 MB
-async fn get_paste_type(content: &str) -> PasteType {
+async fn get_paste_type(bytes: &Vec<u8>, content: &str) -> PasteType {
+    /// Content with size above this value (in bytes) will be checked only for the `Log` type
+    const CHECK_ONLY_LOG_TYPE_SIZE: usize = 1_850_000;
 
-    // JSON needs to be first since every valid JSON is valid YAML
-    if serde_json::from_str::<serde_json::Value>(&content).is_ok() {
-        return PasteType::Json;
-    } else if serde_yaml::from_str::<serde_yaml::Value>(&content).is_ok() {
-        return PasteType::Yaml;
+    if is_log(content) {
+        return PasteType::Log;
+    }
+
+    if bytes.len() < CHECK_ONLY_LOG_TYPE_SIZE {
+        // JSON needs to be checked first since every valid JSON is valid YAML
+        if serde_json::from_str::<serde_json::Value>(&content).is_ok() {
+            return PasteType::Json;
+        } else if serde_yaml::from_str::<serde_yaml::Value>(&content).is_ok() {
+            return PasteType::Yaml;
+        }
+
+        let file_type = match MAGIKA
+            .lock()
+            .await
+            .identify_content_async(bytes.as_slice())
+            .await
+        {
+            Ok(ft) => ft,
+            Err(_) => return PasteType::Other,
+        };
+
+        match file_type.content_type() {
+            Some(ContentType::Yaml) => return PasteType::InvalidYaml,
+            Some(ContentType::Json) => return PasteType::InvalidJson,
+            _ => {}
+        }
     }
 
     PasteType::Other
+}
+
+fn is_log(content: &str) -> bool {
+    const LOG_LEVELS: [&str; 7] = [
+        "INFO", "WARN", "WARNING", "DEBUG", "SEVERE", "FATAL", "ERROR",
+    ];
+
+    let lines = content.lines();
+    let line_count = lines.clone().count();
+
+    let log_level_count = lines
+        .filter(|line| LOG_LEVELS.iter().any(|lvl| line.contains(lvl)))
+        .count();
+
+    const THRESHOLDS: [(usize, usize); 5] = [(5, 1), (15, 2), (30, 4), (50, 6), (100, 8)];
+
+    let required = THRESHOLDS
+        .iter()
+        .find(|&&(max_lines, _)| line_count < max_lines)
+        .map_or(10, |&(_, min_levels)| min_levels);
+
+    return log_level_count >= required;
 }
 
 async fn stream_to_file<S, E>(
