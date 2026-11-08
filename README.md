@@ -13,7 +13,11 @@ Thanks to the advanced [mclog's](https://github.com/caukub/mclog) static analyze
       <img src="assets/details_showcase.png" width="100%" alt="Log details showcase">
       <br>
     </td>
+  </tr>
+</table>
 
+<table>
+  <tr>
     <td align="center" width="50%">
       <img src="assets/invalid_yaml_showcase.png" width="100%" alt="Invalid YAML showcase">
       <br>
