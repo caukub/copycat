@@ -6,7 +6,6 @@ Paste | {{ id }}
 
 {% block content %}
 
-<!--
 <div class="mb-6 mt-3 rounded bg-hostify-blue px-3 py-2 text-white sm:px-6">
     <div class="text-2xl">
         <div class="mb-1.5 flex justify-between">
@@ -23,7 +22,11 @@ Paste | {{ id }}
                         clip-rule="evenodd"
                     />
                 </svg>
-                <h2 class="font-bold">YAML - {{ id }}</h2>
+                {% if paste_type == PasteType::InvalidYaml %}
+                    <h2 class="font-bold">Invalid YAML detected</h2>
+                {% else if paste_type == PasteType::InvalidJson %}
+                    <h2 class="font-bold">Invalid JSON detected</h2>
+                {% endif %}
             </div>
             <div class="flex items-center text-sm font-semibold">
                 <a
@@ -48,8 +51,56 @@ Paste | {{ id }}
             </div>
         </div>
     </div>
+    
+    <div class="mt-6">
+        <div class="detections">
+            <div class="header">
+                <div class="flex items-center justify-between rounded-sm bg-white font-semibold">
+                    <div class="flex items-center py-1 text-hostify-blue">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            class="my-1 ml-2 mr-1.5 h-5 w-5"
+                        >
+                        <path
+                            fill-rule="evenodd"
+                            d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z"
+                            clip-rule="evenodd"
+                        />
+                        </svg>
+                        {% if paste_type == PasteType::InvalidYaml %}
+                            <div>YAML error detected near <span class="font-bold">line {{ error_line }}</span></div>
+                        {% else if paste_type == PasteType::InvalidJson %}
+                            <div>JSON error detected near <span class="font-bold">line {{ error_line }}</span></div>
+                        {% endif %}
+                    </div>
+                            <a href="#L{{ error_line }}" target="_blank" id="error-line-jump"
+                                class="mr-1.5 flex items-center rounded-md bg-hostify-blue text-white px-1 py-0.5"
+                            >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                                class="h-5 w-5"
+                                >
+                                <path
+                                    fill-rule="evenodd"
+                                    d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z"
+                                    clip-rule="evenodd"
+                                /></svg>
+                                <p>Jump to line {{ error_line}}</p>
+                            </a>
+                </div>
+            </div>
+        <div class="my-2">
+            {% if let Some(error) = error -%}
+                <pre>{{ error -}}</pre>
+            {% endif %}
+            </div>
+        </div>
+    </div>
 </div>
--->
 
 <pre id="log-content" class="h-full whitespace-pre-wrap break-words px-3">{{ content|safe }}</pre>
 
@@ -58,21 +109,22 @@ Paste | {{ id }}
 {% block head %}
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
 
-{% if format == ConfigFormat::Yaml %}
+{% if paste_type == PasteType::InvalidYaml %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/yaml.min.js"></script>
-{% else if format == ConfigFormat::Json %}
+{% else if paste_type == PasteType::InvalidJson %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/json.min.js"></script>
 {% endif %}
 
 <script>
-    {% if format == ConfigFormat::Yaml %}
+    {% if paste_type == PasteType::InvalidYaml %}
     document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll("#log-content .p").forEach(el => {
             el.innerHTML = hljs.highlight(el.textContent, { language: "yaml" }).value;
         });
     });
-    {% else if format == ConfigFormat::Json %}
+    {% else if paste_type == PasteType::InvalidJson %}
     document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll("#log-content .p").forEach(el => {
             el.innerHTML = hljs.highlight(el.textContent, { language: "json" }).value;
@@ -107,12 +159,29 @@ Paste | {{ id }}
     const highlightColor = 'oklch(95.32% 0.0218 239.43)';
 
     document.addEventListener("DOMContentLoaded", (event) => {
+        document.getElementById('error-line-jump')?.removeAttribute('target');
+
         if (window.location.hash) {
             let highlightedElement = document.getElementById(window.location.hash.split('#')[1]);
             highlightedElement.style.backgroundColor = highlightColor;
             highlightedElement.scrollIntoView({ behavior: 'smooth' });
         }
-    })
+    });
+
+    window.addEventListener("hashchange", (event) => {
+        document.querySelectorAll("#log-content .p").forEach(el => {
+            el.style.backgroundColor = '';
+        });
+
+        const id = window.location.hash.slice(1);
+
+        const el = document.getElementById(id);
+
+        if (!el) return;
+
+        el.style.backgroundColor = highlightColor;
+        el.scrollIntoView({ behavior: 'smooth' });
+    });
 
     document.addEventListener("click", (event) => {
         let clickedElement = event.target;
@@ -155,7 +224,7 @@ Paste | {{ id }}
                 previousElement = clickedElement;
             }
         }
-    })
+    });
 </script>
 
 <script src="/assets/elements.js" type="module"></script>

@@ -7,6 +7,7 @@ use axum::{
 };
 use futures_util::{Stream, TryStreamExt};
 use magika::ContentType;
+use mclog::parser::LOG_LEVELS;
 use rand::{Rng, distr::Alphanumeric};
 use std::{io, path::PathBuf, pin::pin, sync::LazyLock};
 use tokio::{
@@ -15,7 +16,7 @@ use tokio::{
     sync::Mutex,
 };
 use tokio_util::io::StreamReader;
-use tracing::trace;
+use tracing::{error, trace};
 
 use crate::{AppState, routes::PasteMetadata};
 
@@ -48,9 +49,13 @@ pub async fn upload_handler(
         }
     }
 
-    let bytes = tokio::fs::read(storage_configuration.directory.join(&id))
-        .await
-        .unwrap();
+    let bytes = match tokio::fs::read(storage_configuration.directory.join(&id)).await {
+        Ok(bytes) => bytes,
+        Err(err) => {
+            error!("Failed to read paste '{}' into bytes: {}", id, err);
+            return Ok(Redirect::to("/"));
+        }
+    };
 
     let content = String::from_utf8_lossy(&bytes);
 
@@ -58,20 +63,45 @@ pub async fn upload_handler(
 
     let metadata = PasteMetadata { paste_type };
 
-    let json_metadata = serde_json::to_string(&metadata).unwrap();
+    let json_metadata = match serde_json::to_string(&metadata) {
+        Ok(metadata) => metadata,
+        Err(err) => {
+            error!(
+                "Failed to serialize '{}' JSON metadata into String: {}",
+                id, err
+            );
+            return Ok(Redirect::to("/"));
+        }
+    };
 
-    let mut file =
-        tokio::fs::File::create(storage_configuration.directory.join("metadata").join(&id))
-            .await
-            .unwrap();
+    let metadata_path = storage_configuration.directory.join("metadata").join(&id);
 
-    file.write_all(json_metadata.as_bytes()).await.unwrap();
+    let mut file = match tokio::fs::File::create(&metadata_path).await {
+        Ok(file) => file,
+        Err(err) => {
+            error!(
+                "Failed to create new metadata file ({}) for paste '{}': {}",
+                metadata_path.display(),
+                id,
+                err
+            );
+            return Ok(Redirect::to("/"));
+        }
+    };
+
+    match file.write_all(json_metadata.as_bytes()).await {
+        Ok(_) => {}
+        Err(err) => {
+            error!("Failed to write metadata for {}: {}", id, err);
+            return Ok(Redirect::to("/"));
+        }
+    }
 
     Ok(Redirect::to(&id))
 }
 
 async fn get_paste_type(bytes: &Vec<u8>, content: &str) -> PasteType {
-    /// Content with size above this value (in bytes) will be checked only for the `Log` type
+    // Content with size above this value (in bytes) will be checked only for the `Log` type
     const CHECK_ONLY_LOG_TYPE_SIZE: usize = 1_500_000;
 
     if is_log(content) {
@@ -116,10 +146,6 @@ async fn get_paste_type(bytes: &Vec<u8>, content: &str) -> PasteType {
 }
 
 fn is_log(content: &str) -> bool {
-    const LOG_LEVELS: [&str; 7] = [
-        "INFO", "WARN", "WARNING", "DEBUG", "SEVERE", "FATAL", "ERROR",
-    ];
-
     let lines = content.lines();
     let line_count = lines.clone().count();
 

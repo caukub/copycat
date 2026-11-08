@@ -9,7 +9,7 @@ pub use raw::*;
 use serde::{Deserialize, Serialize};
 pub use upload::*;
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub enum PasteType {
     Log,
