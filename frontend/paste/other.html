@@ -1,0 +1,189 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Paste | {{ id }}
+{% endblock %}
+
+{% block content %}
+
+<!--
+<div class="mb-6 mt-3 rounded bg-hostify-blue px-3 py-2 text-white sm:px-6">
+    <div class="text-2xl">
+        <div class="mb-1.5 flex justify-between">
+            <div class="flex items-center">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    class="mr-1.5 h-6 w-6"
+                >
+                    <path
+                        fill-rule="evenodd"
+                        d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 01.67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 11-.671-1.34l.041-.022zM12 9a.75.75 0 100-1.5.75.75 0 000 1.5z"
+                        clip-rule="evenodd"
+                    />
+                </svg>
+                <h2 class="font-bold">YAML - {{ id }}</h2>
+            </div>
+            <div class="flex items-center text-sm font-semibold">
+                <a
+                    href="/raw/{{ id }}"
+                    target="_blank"
+                    class="flex cursor-pointer rounded-sm bg-white px-1.5 py-0.5 font-bold text-hostify-blue"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 16 16"
+                        fill="currentColor"
+                        class="mr-1 mt-1 size-4"
+                    >
+                        <path
+                            fill-rule="evenodd"
+                            d="M2 2.75A.75.75 0 0 1 2.75 2h9.5a.75.75 0 0 1 0 1.5h-9.5A.75.75 0 0 1 2 2.75ZM2 6.25a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 0 1.5h-5.5A.75.75 0 0 1 2 6.25Zm0 3.5A.75.75 0 0 1 2.75 9h3.5a.75.75 0 0 1 0 1.5h-3.5A.75.75 0 0 1 2 9.75ZM9.22 9.53a.75.75 0 0 1 0-1.06l2.25-2.25a.75.75 0 0 1 1.06 0l2.25 2.25a.75.75 0 0 1-1.06 1.06l-.97-.97v5.69a.75.75 0 0 1-1.5 0V8.56l-.97.97a.75.75 0 0 1-1.06 0Z"
+                            clip-rule="evenodd"
+                        />
+                    </svg>
+                    Raw
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+-->
+
+<pre id="log-content" class="h-full whitespace-pre-wrap break-words px-3">{{ content|safe }}</pre>
+
+{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("#log-content .p").forEach(el => {
+        el.innerHTML = hljs.highlightAuto(el.textContent).value;
+    });
+});
+</script>
+
+<script>
+    function toggleHighlighting() {
+        const styleId = 'disable-highlighting';
+        const existingStyle = document.getElementById(styleId);
+
+        if (existingStyle) {
+            existingStyle.remove();
+        } else {
+            const style = document.createElement('style');
+            style.id = styleId;
+            style.innerHTML = `
+                .i, .w, .e, .c, .highlight { 
+                    color: unset !important; 
+                    font-weight: normal !important;
+                    background-color: unset !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+</script>
+
+<script>
+    const highlightColor = 'oklch(95.32% 0.0218 239.43)';
+
+    document.addEventListener("DOMContentLoaded", (event) => {
+        if (window.location.hash) {
+            let highlightedElement = document.getElementById(window.location.hash.split('#')[1]);
+            highlightedElement.style.backgroundColor = highlightColor;
+            highlightedElement.scrollIntoView({ behavior: 'smooth' });
+        }
+    })
+
+    document.addEventListener("click", (event) => {
+        let clickedElement = event.target;
+
+        let previousElement = document.getElementById(window.location.hash.split('#')[1]);
+
+        if (clickedElement.classList.contains('p')) {
+            // TODO rewrite, not ideal approach
+            const beforeStyles = window.getComputedStyle(clickedElement, '::before');
+
+            const beforeWidth = parseFloat(beforeStyles.width);
+            const beforeHeight = parseFloat(beforeStyles.height);
+            const beforeTop = parseFloat(beforeStyles.top);
+            const beforeLeft = parseFloat(beforeStyles.left);
+        
+            const rect = clickedElement.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const clickY = event.clientY - rect.top;
+        
+            const isClickedOnBefore = 
+                clickX >= beforeLeft && 
+                clickX <= (beforeLeft + beforeWidth) &&
+                clickY >= beforeTop && 
+                clickY <= (beforeTop + beforeHeight);
+
+            if (!isClickedOnBefore) return;
+
+            if (window.location.hash && clickedElement.id === window.location.hash.split('#')[1]) {
+                clickedElement.style.backgroundColor = '';
+                history.replaceState(null, null, window.location.pathname + window.location.search);
+            } else {
+                clickedElement.scrollIntoView();
+                clickedElement.style.backgroundColor = highlightColor;
+                window.location.hash = clickedElement.id;
+
+                if (previousElement && window.location.hash && previousElement.id !== clickedElement.id) {
+                    previousElement.style.backgroundColor = '';
+                }
+
+                previousElement = clickedElement;
+            }
+        }
+    })
+</script>
+
+<script src="/assets/elements.js" type="module"></script>
+
+<style>
+	.i, .w, .e, .c {
+		font-weight: 600;
+	}
+
+	pre {
+		font-size: 13px; /* 0.9rem;*/
+		counter-reset: line-number;
+	}
+
+	pre .p {
+		display: block;
+		counter-increment: line-number;
+		position: relative;
+		padding-left: 2.4em;
+        min-height: 1lh;
+	}
+
+	pre .p::before {
+		content: counter(line-number);
+		position: absolute;
+		left: 0;
+		color: oklch(62.68% 0 0);
+		cursor: pointer;
+	}
+
+	.solution {
+		border-left: 4px solid oklch(100% 0 0);
+		padding-left: 0.75rem;
+	}
+
+    .highlight {
+        background-color: oklch(0.95 0.086 95);
+    }
+
+    .i { color: var(--color-hostify-blue); }
+    .w { color: var(--color-hostify-yellow); }
+    .e { color: var(--color-hostify-red); }
+    .c { color: green; }
+</style>
+{% endblock %}

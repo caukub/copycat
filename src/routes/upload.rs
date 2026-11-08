@@ -8,35 +8,18 @@ use axum::{
 use futures_util::{Stream, TryStreamExt};
 use magika::ContentType;
 use rand::{Rng, distr::Alphanumeric};
-use serde::Serialize;
-use std::{io, path::PathBuf, pin::pin, str::Lines, sync::LazyLock};
+use std::{io, path::PathBuf, pin::pin, sync::LazyLock};
 use tokio::{
     fs::File,
     io::{AsyncReadExt, AsyncWriteExt, BufWriter},
     sync::Mutex,
 };
 use tokio_util::io::StreamReader;
-use tracing::{error, trace};
+use tracing::trace;
 
-use crate::AppState;
+use crate::{AppState, routes::PasteMetadata};
 
-#[derive(Serialize, Clone, Debug)]
-#[serde(rename_all = "snake_case")]
-enum PasteType {
-    Log,
-    Yaml,
-    Json,
-    InvalidYaml,
-    InvalidJson,
-    Other,
-}
-
-#[derive(Serialize, Clone)]
-#[serde(rename_all = "lowercase")]
-struct PasteMetadata {
-    #[serde(rename = "type")]
-    paste_type: PasteType,
-}
+use super::PasteType;
 
 pub static MAGIKA: LazyLock<Mutex<magika::Session>> =
     LazyLock::new(|| Mutex::new(magika::Session::new().unwrap()));
@@ -72,8 +55,6 @@ pub async fn upload_handler(
     let content = String::from_utf8_lossy(&bytes);
 
     let paste_type = get_paste_type(&bytes, &content).await;
-
-    error!("{:?}", paste_type);
 
     let metadata = PasteMetadata { paste_type };
 

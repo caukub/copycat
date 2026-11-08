@@ -2,7 +2,7 @@
 
 {% block title %}
 Paste | {{ id }}
-{% endblock %}
+{% endblock title %}
 
 {% block content %}
 
@@ -170,11 +170,11 @@ Paste | {{ id }}
     {% endif %}
 </div>
 
-<pre id="log-content" class="h-full whitespace-pre-wrap break-words px-3">{{ data.content|safe }}</pre>
+<pre id="log-content" class="h-full whitespace-pre-wrap break-words px-3">{{ content|safe }}</pre>
 
 {% include "slideover.html" %}
 
-{% endblock %}
+{% endblock content %}
 
 {% block head %}
 <script>
@@ -259,7 +259,7 @@ Paste | {{ id }}
 <style>
 	.i, .w, .e, .c {
 		font-weight: 600;
-	}
+	}\
 
 	pre {
 		font-size: 13px; /* 0.9rem;*/
@@ -270,7 +270,8 @@ Paste | {{ id }}
 		display: block;
 		counter-increment: line-number;
 		position: relative;
-		padding-left: 2.4em; /* TODO depend on line count */
+		padding-left: 2.4em;
+        min-height: 1lh;
 	}
 
 	pre .p::before {
@@ -295,4 +296,4 @@ Paste | {{ id }}
     .e { color: var(--color-hostify-red); }
     .c { color: green; }
 </style>
-{% endblock %}
+{% endblock head %}
