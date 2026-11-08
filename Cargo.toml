@@ -26,8 +26,8 @@ serde_yaml = { package = "yaml_serde", version = "0.10.7" }
 tokio = { version = "1.49.0", features = ["signal", "net", "rt-multi-thread", "io-util", "fs"] }
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
-mclog = { version = "0.1.0", path = "/Users/jakubtrumpes/Projects/paste/mclog" }
-# mclog = { git = "https://github.com/caukub/mclog.git" }
+# mclog = { version = "0.1.0", path = "../mclog" }
+mclog = { git = "https://github.com/caukub/mclog.git" }
 magika = { version = "1.1.0", optional = true }
 ort = "=2.0.0-rc.12"
 futures-util = "0.3.31"
