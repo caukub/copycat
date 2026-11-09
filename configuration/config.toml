@@ -1,5 +1,5 @@
 [application]
-host = "::1"
+host = "0.0.0.0"
 port = 3000
 body_limit_in_bytes = 100_000_000
 
