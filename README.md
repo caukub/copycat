@@ -85,8 +85,5 @@ Requirements: C/C++ toolchain (Xcode Command Line Tools - `xcode-select --instal
 2) Enable `nix-command flakes` experimental feature using `mkdir -p ~/.config/nix && echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf` command if not enabled already
 3) Run the flake using `nix run` command
 
-## TODO
-- Log entry type in script with callback support
-
 ## Special thanks
 - [kyngs](https://github.com/kyngs) for the name idea.
