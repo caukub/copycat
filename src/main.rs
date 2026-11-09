@@ -27,18 +27,10 @@ async fn main() {
 
     let storage_config = configuration.storage.clone();
 
-    let data_dir = &storage_config.directory;
-    let metadata_dir = data_dir.join("metadata");
-
-    if !std::path::Path::new(&data_dir).exists() {
-        std::fs::create_dir(&data_dir).unwrap_or_else(|err| {
-            error!("Failed to create data  directory: {}", err);
-            std::process::exit(1);
-        });
-    }
+    let metadata_dir = &storage_config.directory.join("metadata");
 
     if !std::path::Path::new(&metadata_dir).exists() {
-        std::fs::create_dir(&metadata_dir).unwrap_or_else(|err| {
+        std::fs::create_dir_all(&metadata_dir).unwrap_or_else(|err| {
             error!("Failed to create data's metadata directory: {}", err);
             std::process::exit(1);
         });

@@ -63,6 +63,7 @@
             text = ''
               workdir="''${XDG_CACHE_HOME:-$HOME/.cache}/copycat"
               mkdir -p "$workdir"
+              mkdir -p "$PWD/data"
               ln -sfn ${unwrapped}/share/copycat/frontend "$workdir/frontend"
               ln -sfn "$PWD/configuration" "$workdir/configuration"
               ln -sfn "$PWD/data" "$workdir/data"
