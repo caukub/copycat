@@ -40,9 +40,12 @@
             };
 
             nativeBuildInputs = [ pkgs.pkg-config pkgs.tailwindcss_4 ];
-            buildInputs = [ pkgs.openssl ];
+            
+            buildInputs = [ pkgs.openssl pkgs.onnxruntime ];
 
-            ORT_LIB_LOCATION = "${pkgs.onnxruntime}";
+            NIX_LDFLAGS = "-L${pkgs.onnxruntime}/lib";
+
+            ORT_LIB_LOCATION = "${pkgs.onnxruntime}/lib";
             ORT_PREFER_DYNAMIC_LINK = "1";
 
             preBuild = ''
