@@ -76,14 +76,14 @@ Requirements: C/C++ toolchain (Xcode Command Line Tools - `xcode-select --instal
 4) Build the project using `cargo build --release` command and run it with `cargo run --release`
 
 ### Docker
-1) Clone the repository using following command: `git clone https://github.com/caukub/copycat.git`
-2) `cd` into the project directory and build the Docker image using `docker build -t copycat .` command
+1) Clone the repository using following command: `git clone https://github.com/caukub/copycat.git` and `cd` into it
+2) Build the Docker image using `docker build -t copycat .` command
 3) Start the container using `docker run -p 3000:3000 -v ./configuration:/app/configuration -v ./data:/app/data copycat` command
 
 ### Nix
-1) Clone the repository using following command: `git clone https://github.com/caukub/copycat.git`
+1) Clone the repository using following command: `git clone https://github.com/caukub/copycat.git` and `cd` into it
 2) Enable `nix-command flakes` experimental feature using `mkdir -p ~/.config/nix && echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf` command if not enabled already
-3) `cd` into the project directory and run the flake using `nix run` command
+3) Run the flake using `nix run` command
 
 ## TODO
 - Log entry type in script with callback support
