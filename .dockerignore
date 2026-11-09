@@ -8,8 +8,6 @@ Dockerfile
 
 assets
 
-detection-examples
-
 tailwind
 
 flake.nix
