@@ -27,7 +27,7 @@ async fn main() {
 
     let storage_config = configuration.storage.clone();
 
-    let data_dir = storage_config.directory;
+    let data_dir = &storage_config.directory;
     let metadata_dir = data_dir.join("metadata");
 
     if !std::path::Path::new(&data_dir).exists() {
