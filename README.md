@@ -30,7 +30,7 @@ Thanks to the advanced [mclog's](https://github.com/caukub/mclog) static analyze
 </table>
 
 ## Motivation
-After reading hundreds of Minecraft logs, I've seen *a lot* of repetition that I wanted to automate. Unfortunately, all alternatives that I found didn't fit our needs, mainly because of the lack of flexibility in detecting errors and solutions for them.
+After reading hundreds of Minecraft logs, I've seen *a lot* of repetition that I wanted to automate. Unfortunately, all existing alternatives didn't fit our needs, mainly because of the lack of flexibility in detecting errors and solutions for them.
 
 That's why copycat has a [dynamic analyzer](https://github.com/caukub/copycat/wiki/Analyzer#Dynamic) which allows you to write custom detection scripts based on many factors like the server info, plugin info, or the log content itself.
 
@@ -62,6 +62,9 @@ As you can see in the first screenshot, you can select a specific line to jump t
 copycat also support Y(A)ML and JSON files so configuration files can be displayed properly.
 
 **If content should be JSON/YAML but the format is invalid, parser error is shown** (thanks to [magika](https://github.com/google/magika)).
+
+### No JavaScript
+Almost all of these features works without JavaScript enabled.
 
 ## Installation
 ### Default
