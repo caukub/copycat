@@ -5,3 +5,13 @@ target
 
 Dockerfile
 .dockerignore
+
+assets
+
+detection-examples
+
+tailwind
+
+flake.nix
+
+README.md
