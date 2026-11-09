@@ -79,7 +79,8 @@ Requirements: C/C++ toolchain (Xcode Command Line Tools - `xcode-select --instal
 
 ### Nix
 1) Clone the repository using following command: `git clone https://github.com/caukub/copycat.git`
-2) `cd` into the project directory and run the flake using `nix run` command
+2) Enable `nix-command flakes` experimental feature using `mkdir -p ~/.config/nix && echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf` command if not enabled already
+3) `cd` into the project directory and run the flake using `nix run` command
 
 ## TODO
 - Log entry type in script with callback support
