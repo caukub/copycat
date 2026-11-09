@@ -29,6 +29,24 @@ Thanks to the advanced [mclog's](https://github.com/caukub/mclog) static analyze
   </tr>
 </table>
 
+## Installation
+### Default
+Requirements: C/C++ toolchain (Xcode Command Line Tools - `xcode-select --install` on macOS, `g++`, `pkg-config` and OpenSSL headers - `libssl-dev` on Linux)
+
+1) Install Rust using the `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh` command
+2) Clone the repository using the `git clone https://github.com/caukub/copycat.git` command and `cd` into it
+3) Download [Tailwind Standalone CLI ](https://github.com/tailwindlabs/tailwindcss/releases), rename the executable to `tailwind`, make it executable using `chmod +x tailwind` command, put it in the project directory and generate the CSS using `./tailwind -m -i frontend/assets/input.css -o frontend/assets/styles.css` command
+4) Build the project using `cargo build --release` command and run it with `cargo run --release`
+
+### Docker
+1) Clone the repository using following command: `git clone https://github.com/caukub/copycat.git`
+2) `cd` into the project directory and build the Docker image using `docker build -t copycat .` command
+3) Start the container using `docker run -p 3000:3000 -v ./configuration:/app/configuration -v ./data:/app/data copycat` command
+
+### Nix
+1) Clone the repository using following command: `git clone https://github.com/caukub/copycat.git`
+2) `cd` into the project directory and run the flake using `nix run` command
+
 ## Motivation
 After reading hundreds of Minecraft logs, I've seen *a lot* of repetition that I wanted to automate. Unfortunately, all alternatives that I found didn't fit our needs, mainly because of the lack of flexibility in detecting errors and solutions for them.
 
