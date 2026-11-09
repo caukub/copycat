@@ -25,12 +25,16 @@ async fn main() {
         std::process::exit(1);
     });
 
-    let data_config = configuration.storage.clone();
+    let storage_config = configuration.storage.clone();
 
-    std::fs::create_dir_all(data_config.directory.join("metadata")).unwrap_or_else(|err| {
-        error!("Failed to create data directory: {}", err);
-        std::process::exit(1);
-    });
+    let metadata_path = storage_config.directory.join("metadata");
+
+    if !std::path::Path::new(&metadata_path).exists() {
+        std::fs::create_dir_all(&metadata_path).unwrap_or_else(|err| {
+            error!("Failed to create data directory: {}", err);
+            std::process::exit(1);
+        });
+    }
 
     let app_state = AppState {
         configuration: configuration.clone(),
@@ -90,7 +94,7 @@ async fn main() {
     );
 
     tokio::spawn(async move {
-        if let Err(err) = delete_expired(&data_config).await {
+        if let Err(err) = delete_expired(&storage_config).await {
             error!(
                 "Failed to run background task for deleting expired files: {}",
                 err
