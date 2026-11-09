@@ -128,10 +128,6 @@ impl ConfigParseError {
 
         message
     }
-
-    fn line(&self) -> Option<usize> {
-        self.line
-    }
 }
 
 fn context(src: &str, line: usize, col: usize, radius: usize) -> String {
