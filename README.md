@@ -63,6 +63,9 @@ copycat also support Y(A)ML and JSON files so configuration files can be display
 
 **If content should be JSON/YAML but the format is invalid, parser error is shown** (thanks to [magika](https://github.com/google/magika)).
 
+### Highlighting
+All pastes, no matter if it's Minecraft log, YAML, JSON, Java or Rust, are automatically highlighted.
+
 ### No JavaScript
 Almost all of these features works without JavaScript enabled.
 
