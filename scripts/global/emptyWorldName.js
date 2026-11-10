@@ -1,4 +1,4 @@
-if (Log.contains_line('Preparing level ""')) {
+if (Log.containsLine('Preparing level ""')) {
     return "EmptyWorldName";
 }
 
