@@ -81,7 +81,7 @@ Requirements: C/C++ toolchain (Xcode Command Line Tools - `xcode-select --instal
 3) Start the container using `docker run -p 3000:3000 -v ./data:/app/data copycat` command
 
 ### Nix
-1) Clone the repository using following command: `git clone https://github.com/caukub/copycat.git` and `cd` into it
+1) Clone the repository using the `git clone https://github.com/caukub/copycat.git` command and `cd` into it
 2) Enable `nix-command flakes` experimental feature using `mkdir -p ~/.config/nix && echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf` command if not enabled already
 3) Run the flake using `nix run` command
 
