@@ -1,4 +1,4 @@
-if (Server.version <= "1.16.5" && Server.version > "1.8.9" && Server.java_version > 8) {
+if (Server.version <= "1.16.5" && Server.version > "1.8.9" && Server.javaVersion > 8) {
     return "JavaTooModern";
 }
 
