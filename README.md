@@ -1,7 +1,7 @@
 # copycat
 copycat is a pastebin service mainly for Minecraft servers written in Rust and built on top of [mclog](https://github.com/caukub/mclog), a library responsible for parsing and extracting information from the log.
 
-Thanks to the advanced [mclog's](https://github.com/caukub/mclog) static analyzer and [dynamic analyzer](https://github.com/caukub/copycat/wiki/Analyzer) powered by JavaScript, you can easily get information about a server and give the users solutions on how to solve issues based on it.
+Thanks to the advanced [mclog's](https://github.com/caukub/mclog) static analyzer and [dynamic analyzer](scripts/) powered by JavaScript, you can easily get information about a server and give the users solutions on how to solve issues based on it.
 
 <table>
   <tr>
@@ -32,7 +32,7 @@ Thanks to the advanced [mclog's](https://github.com/caukub/mclog) static analyze
 ## Motivation
 After reading hundreds of Minecraft logs, I've seen *a lot* of repetition that I wanted to automate. Unfortunately, all existing alternatives didn't fit our needs, mainly because of the lack of flexibility in detecting errors and solutions for them.
 
-That's why copycat has a [dynamic analyzer](https://github.com/caukub/copycat/wiki/Analyzer#Dynamic) which allows you to write custom detection scripts based on many factors like the server info, plugin info, or the log content itself.
+That's why copycat has a [dynamic analyzer](scripts/) which allows you to write custom detection scripts based on many factors like the server info, plugin info, or the log content itself.
 
 ## Features
 **Note:** All features are not implemented yet since [mclog](https://github.com/caukub/mclog) has been rewrited.
