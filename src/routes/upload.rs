@@ -112,9 +112,9 @@ async fn get_paste_type(bytes: &Vec<u8>, content: &str) -> PasteType {
 
     if bytes.len() < CHECK_ONLY_LOG_TYPE_SIZE {
         // JSON needs to be checked first since every valid JSON is valid YAML
-        if serde_json::from_str::<serde_json::Value>(&content).is_ok() {
+        if serde_json::from_str::<serde_json::Value>(content).is_ok() {
             return PasteType::Json;
-        } else if serde_yaml::from_str::<serde_yaml::Value>(&content).is_ok() {
+        } else if serde_yaml::from_str::<serde_yaml::Value>(content).is_ok() {
             is_valid_yaml = true;
         }
 
@@ -160,7 +160,7 @@ fn is_log(content: &str) -> bool {
         .find(|&&(max_lines, _)| line_count < max_lines)
         .map_or(10, |&(_, min_levels)| min_levels);
 
-    return log_level_count >= required;
+    log_level_count >= required
 }
 
 async fn stream_to_file<S, E>(

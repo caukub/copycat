@@ -185,7 +185,7 @@ async fn load_paste(
     storage_directory: &std::path::Path,
     id: &str,
 ) -> Result<(String, PasteMetadata), PasteError> {
-    let paste_path = storage_directory.join(&id);
+    let paste_path = storage_directory.join(id);
 
     let content = tokio::fs::read_to_string(&paste_path)
         .await
@@ -199,7 +199,7 @@ async fn load_paste(
             PasteError
         })?;
 
-    let metadata_path = storage_directory.join("metadata").join(&id);
+    let metadata_path = storage_directory.join("metadata").join(id);
 
     let metadata_bytes: Vec<u8> = tokio::fs::read(&metadata_path).await.map_err(|err| {
         error!(
@@ -242,11 +242,11 @@ fn render_log(id: String, lines: &[&str]) -> Response {
     };
     */
 
-    let static_analyzer = StaticAnalyzer::new(&lines);
+    let static_analyzer = StaticAnalyzer::new(lines);
     let plugins = static_analyzer.plugins(Some(1000)); // TODO sort plugins by name and filter out disabled ones
     let server_info = static_analyzer.version_platform(Some(750));
 
-    let parser = Parser::new(&lines, Some(10000), Some(500), Some(15));
+    let parser = Parser::new(lines, Some(10000), Some(500), Some(15));
 
     let html = parser.html_lines();
     let content = html.concat();
@@ -281,7 +281,7 @@ fn render_log(id: String, lines: &[&str]) -> Response {
 }
 
 fn render_yaml_json(id: String, lines: &[&str], metadata: PasteMetadata) -> Response {
-    let parser = NoLogParser::new(&lines);
+    let parser = NoLogParser::new(lines);
 
     let html = parser.html();
     let content = html.concat();
@@ -307,7 +307,7 @@ fn render_invalid_yaml_json(
         _ => unreachable!(),
     };
 
-    let parser = NoLogParser::new(&lines);
+    let parser = NoLogParser::new(lines);
 
     let html = parser.html();
     let content = html.concat();
@@ -326,7 +326,7 @@ fn render_invalid_yaml_json(
 }
 
 fn render_other(id: String, lines: &[&str]) -> Response {
-    let parser = NoLogParser::new(&lines);
+    let parser = NoLogParser::new(lines);
 
     let html = parser.html();
     let content = html.concat();

@@ -30,7 +30,7 @@ async fn main() {
     let metadata_dir = &storage_config.directory.join("metadata");
 
     if !std::path::Path::new(&metadata_dir).exists() {
-        std::fs::create_dir_all(&metadata_dir).unwrap_or_else(|err| {
+        std::fs::create_dir_all(metadata_dir).unwrap_or_else(|err| {
             error!("Failed to create data's metadata directory: {}", err);
             std::process::exit(1);
         });
