@@ -58,7 +58,7 @@ IP addresses are hidden but plugin or server related versions that matches IP ad
 ### Line highlighting (linking)
 As you can see in the first screenshot, you can select a specific line to jump to when the page opens.
 
-## JSON and YAML support
+### JSON and YAML support
 copycat also support Y(A)ML and JSON files so configuration files can be displayed properly.
 
 **If content should be JSON/YAML but the format is invalid, parser error is shown** (thanks to [magika](https://github.com/google/magika)).
