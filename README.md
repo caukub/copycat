@@ -76,9 +76,9 @@ Requirements: C/C++ toolchain (Xcode Command Line Tools - `xcode-select --instal
 4) Build the project using `cargo build --release` command and run it with `cargo run --release`
 
 ### Docker
-1) Clone the repository using following command: `git clone https://github.com/caukub/copycat.git` and `cd` into it
+1) Clone the repository using the `git clone https://github.com/caukub/copycat.git` command and `cd` into it
 2) Build the Docker image using `docker build -t copycat .` command
-3) Start the container using `docker run -p 3000:3000 -v ./configuration:/app/configuration -v ./data:/app/data copycat` command
+3) Start the container using `docker run -p 3000:3000 -v ./data:/app/data copycat` command
 
 ### Nix
 1) Clone the repository using following command: `git clone https://github.com/caukub/copycat.git` and `cd` into it
