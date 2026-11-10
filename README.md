@@ -63,10 +63,10 @@ copycat also support Y(A)ML and JSON files so configuration files can be display
 
 **If content should be JSON/YAML but the format is invalid, parser error is shown** (thanks to [magika](https://github.com/google/magika)).
 
-### Syntax Highlighting
+### Syntax highlighting
 All pastes, even those without special support like YAML, are automatically highlighted.
 
-### No JavaScript
+### No JavaScript needed
 Almost all of these features works without JavaScript enabled.
 
 ## Installation
@@ -76,7 +76,7 @@ Requirements: C/C++ toolchain (Xcode Command Line Tools - `xcode-select --instal
 1) Install Rust using the `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh` command
 2) Clone the repository using the `git clone https://github.com/caukub/copycat.git` command and `cd` into it
 3) Download [Tailwind Standalone CLI ](https://github.com/tailwindlabs/tailwindcss/releases), rename the executable to `tailwind`, make it executable using `chmod +x tailwind` command, put it in the project directory and generate the CSS using `./tailwind -m -i frontend/assets/input.css -o frontend/assets/styles.css` command
-4) Build the project using `cargo build --release` command and run it with `cargo run --release`
+4) Build the project using `cargo build --release` command (executable will be generated in `/target/release`) or run it with `cargo run --release`
 
 ### Docker
 1) Clone the repository using the `git clone https://github.com/caukub/copycat.git` command and `cd` into it
