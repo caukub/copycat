@@ -30,7 +30,7 @@ Thanks to the advanced [mclog's](https://github.com/caukub/mclog) static analyze
 </table>
 
 ## Motivation
-After reading hundreds of Minecraft logs, I've seen *a lot* of repetition that I wanted to automate. Unfortunately, all existing alternatives didn't fit our needs, mainly because of the lack of flexibility in detecting errors and solutions for them.
+After reading hundreds of Minecraft logs years back, I've seen *a lot* of repetition that I wanted to automate. Unfortunately, all existing alternatives didn't fit our needs, mainly because of the lack of flexibility in detecting errors and solutions for them.
 
 That's why copycat has a [dynamic analyzer](scripts/) which allows you to write custom detection scripts based on many factors like the server info, plugin info, or the log content itself.
 
